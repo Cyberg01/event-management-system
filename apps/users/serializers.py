@@ -35,7 +35,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         
     def validate_email(self, value):
         """Check if email is unique (if changed)"""
-        if not self.instance:  # ← CEK DULU
+        if not self.instance:
             return value
         
         user = self.instance
@@ -45,7 +45,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     def validate_username(self, value):
         """Check if username is unique (if changed)"""
-        if not self.instance:  # ← CEK DULU
+        if not self.instance:
             return value
         
         user = self.instance
