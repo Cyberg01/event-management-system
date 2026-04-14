@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # apps
     'apps.users',
     'apps.events',
+    'apps.venues',
 ]
 
 MIDDLEWARE = [
