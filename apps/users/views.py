@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.users.models import UserProfile
-from apps.users.serializers import UserRegisterSerializer, UserDetailSerializer
+from apps.users.serializers import UserRegisterSerializer, UserDetailSerializer, UserUpdateSerializer
 
 # JWT Token Generator Helper
 def get_tokens_for_user(user):
@@ -42,3 +42,30 @@ def showUser(request):
         user = request.user
         serializer = UserDetailSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUser(request):
+    """ API for updating user profile details (except password)"""
+    """PUT /api/v1/auth/profile/"""
+    if request.method == 'PUT':
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteUser(request):
+    """ API for deleting user profile"""
+    """DELETE /api/v1/auth/profile/"""
+    if request.method == 'DELETE':
+        user = request.user
+        user.delete()
+        return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
