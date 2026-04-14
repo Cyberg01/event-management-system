@@ -33,8 +33,16 @@ class Event(models.Model):
     event_end_time = models.DateTimeField()
     registration_start_time = models.DateTimeField()
     registration_end_time = models.DateTimeField()
-    creator_id = models.IntegerField(blank=False, null=False)
-    venue_id = models.CharField(max_length=255, blank=False, null=False)
+    creator_id = models.ForeignKey(
+        'users.UserProfile', 
+        related_name='created_events', 
+        on_delete=models.CASCADE)
+    venue_id = models.ForeignKey(
+        'users.UserProfile', 
+        related_name='created_events', 
+        on_delete=models.CASCADE
+        )
+    metadata = models.JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ['-event_start_time']
