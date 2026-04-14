@@ -38,3 +38,13 @@ def updateEvent(request, event_id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Event.DoesNotExist:
         return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteEvent(request, event_id):
+    try:
+        event = get_object_or_404(Event, id=event_id)
+        event.delete()
+        return Response({'message': 'Event deleted successfully'}, status=status.HTTP_200_OK)
+    except Event.DoesNotExist:
+        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND) 
