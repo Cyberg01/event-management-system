@@ -23,4 +23,18 @@ def showEventById(request, event_id):
         serializer = EventSerializer(event)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Event.DoesNotExist:
-        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)   
+        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateEvent(request, event_id):
+    try:
+        event = get_object_or_404(Event, id=event_id)
+        serializer = EventSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Event.DoesNotExist:
+        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
