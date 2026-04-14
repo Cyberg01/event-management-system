@@ -15,6 +15,7 @@ class Venue(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        db_table = 'venues'
         verbose_name = 'Venue'
 
     def __str__(self):
