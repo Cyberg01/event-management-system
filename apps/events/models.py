@@ -36,12 +36,16 @@ class Event(models.Model):
     creator_id = models.ForeignKey(
         'users.UserProfile', 
         related_name='created_events', 
-        on_delete=models.SET_NULL)
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+        )
     venue_id = models.ForeignKey(
         'venues.Venue', 
         related_name='created_events', 
         on_delete=models.SET_NULL,
         blank=True,
+        null=True
         )
     metadata = models.JSONField(blank=True, null=True)
 
