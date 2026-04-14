@@ -9,6 +9,12 @@ EVENT_STATUS = (
     ('cancelled', 'Cancelled')
 )
 
+EVENT_TYPE = (
+    ('online', 'Online'),
+    ('in-person', 'In-Person'),
+    ('hybrid', 'Hybrid')
+)
+
 class Event(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=False)
@@ -17,28 +23,33 @@ class Event(models.Model):
         default='upcoming', 
         choices=EVENT_STATUS
         )
-    date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-    capacity = models.PositiveIntegerField()
-    venue = models.JSONField()
-    organizer = models.CharField(max_length=255)
-    creatorId = models.ForeignKey(
-        'users.UserProfile', 
-        on_delete=models.CASCADE, 
-        related_name='created_events'
-        )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    event_type = models.CharField(
+        max_length=50,
+        choices=EVENT_TYPE,
+        default='online'
+    )
+    capacity = models.PositiveIntegerField(null=False, default=10)
+    event_start_time = models.DateTimeField()
+    event_end_time = models.DateTimeField()
+    registration_start_time = models.DateTimeField()
+    registration_end_time = models.DateTimeField()
+    creator_id = models.IntegerField(blank=False, null=False)
+    venue_id = models.CharField(max_length=255, blank=False, null=False)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-event_start_time']
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
 
     def clean(self):
-        if self.date < timezone.now().date():
-            raise ValidationError('Event date cannot be in the past.')
+        if self.event_start_time < timezone.now():
+            raise ValidationError('Event start time cannot be in the past.')
+        if self.event_end_time <= self.event_start_time:
+            raise ValidationError('Event end time must be after the start time.')
+        if self.registration_start_time < timezone.now():
+            raise ValidationError('Registration start time cannot be in the past.')
+        if self.registration_end_time <= self.registration_start_time:
+            raise ValidationError('Registration end time must be after the registration start time.')
             
     def __str__(self):
         return self.title
