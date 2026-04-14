@@ -19,5 +19,9 @@ class UserProfile(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'users'
+        verbose_name = 'User'
+
     def __str__(self):
         return self.username
