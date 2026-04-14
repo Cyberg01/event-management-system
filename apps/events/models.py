@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
@@ -16,6 +18,7 @@ EVENT_TYPE = (
 )
 
 class Event(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=False)
     status = models.CharField(
