@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-class Registration(models.Model):
+class Registrations(models.Model):
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
@@ -20,7 +20,7 @@ class Registration(models.Model):
         related_name='attendees'
     )
     session = models.ForeignKey(
-        'sessions.Session',
+        'event_sessions.Session',
         on_delete=models.SET_NULL,
         related_name='registrations'
     )
