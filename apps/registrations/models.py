@@ -20,9 +20,9 @@ class Registrations(models.Model):
         related_name='attendees'
     )
     session = models.ForeignKey(
-        'event_sessions.Session',
-        on_delete=models.SET_NULL,
-        related_name='registrations'
+        'event_sessions.Sessions',
+        on_delete=models.CASCADE,
+        related_name='registrations',
     )
     track = models.ForeignKey(
         'tracks.Track',
