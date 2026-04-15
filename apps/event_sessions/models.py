@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
 
-class Session(models.Model):
+class Sessions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey('events.Event', on_delete=models.CASCADE, related_name='sessions')
     title = models.CharField(max_length=255)
