@@ -1,8 +1,8 @@
 import uuid
-
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 EVENT_STATUS = (
     ('upcoming', 'Upcoming'),
@@ -36,21 +36,23 @@ class Event(models.Model):
     event_end_time = models.DateTimeField()
     registration_start_time = models.DateTimeField()
     registration_end_time = models.DateTimeField()
-    creator_id = models.ForeignKey(
-        'users.UserProfile', 
-        related_name='created_events', 
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        related_name='events', 
         on_delete=models.SET_NULL,
         null=True,
         blank=True
         )
-    venue_id = models.ForeignKey(
+    venue = models.ForeignKey(
         'venues.Venue', 
-        related_name='created_events', 
+        related_name='events', 
         on_delete=models.SET_NULL,
         blank=True,
         null=True
         )
     metadata = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-event_start_time']
