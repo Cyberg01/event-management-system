@@ -7,13 +7,14 @@ class UserProfile(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ROLE_CHOICES = (
         ("ADMIN", "Admin"),
-        ("ATTENDEE", "Attendee"),
+        ("USER", "User"),
+        ("SPEAKER", "Speaker"),
     )
 
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
-        default="ATTENDEE"
+        default="USER"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
