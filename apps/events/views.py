@@ -1,19 +1,28 @@
+from django_filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from apps.events.filters import EventFilter
 from .serializers import EventSerializer
 from .models import Event
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import ListAPIView
 from rest_framework import status
+from rest_framework.filters import SearchFilter, OrderingFilter
 from apps.common.utils.responses import success_response, error_response
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def listEvents(request):
-    events = Event.objects.all().select_related('venue', 'creator').order_by('-created_at')
-    serializer = EventSerializer(events, many=True)
-    return success_response(serializer.data, message="Events retrieved successfully")
+class EventListView(ListAPIView):
+    queryset = Event.objects.all().order_by('-created_at')
+    serializer_class = EventSerializer
 
+    permission_classes = [IsAuthenticated]
+
+    filterset_class = EventFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    search_fields = ['title', 'description']
+    ordering_fields = ['start_date', 'capacity']
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
