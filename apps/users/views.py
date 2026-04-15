@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.users.models import UserProfile
 from apps.users.serializers import UserRegisterSerializer, UserDetailSerializer, UserUpdateSerializer
+from apps.common.utils.responses import success_response, error_response
 
 # JWT Token Generator Helper
 def get_tokens_for_user(user):
@@ -17,55 +18,58 @@ def get_tokens_for_user(user):
 
 @api_view(['POST'])
 def createUser(request):
-    """ API for user registration"""
-    """POST /api/v1/auth/register/"""
-
     if request.method == 'POST':
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             tokens = get_tokens_for_user(user)
-            return Response({
-                'user': UserDetailSerializer(user).data,
-                'tokens': tokens,
-                'message': 'User registered successfully'
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return success_response(
+                {
+                    'user': UserDetailSerializer(user).data,
+                    'refresh': tokens['refresh'],
+                    'access': tokens['access']
+                },
+                message='User registered successfully',
+                status=status.HTTP_201_CREATED
+            )
+        return error_response(
+            message='Registration failed',
+            errors=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def showUser(request):
-    """ API for showing user profile details"""
-    """GET /api/v1/auth/profile/"""
     if request.method == 'GET':
         user = request.user
         serializer = UserDetailSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return success_response(serializer.data, message='User profile retrieved successfully')
+    return error_response(message='Method not allowed', status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateUser(request):
-    """ API for updating user profile details (except password)"""
-    """PUT /api/v1/auth/profile/"""
     if request.method == 'PUT':
         user = request.user
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return success_response(serializer.data, message='User updated successfully')
+        return error_response(
+            message='Update failed',
+            errors=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
     
-    return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return error_response(message='Method not allowed', status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteUser(request):
-    """ API for deleting user profile"""
-    """DELETE /api/v1/auth/profile/"""
     if request.method == 'DELETE':
         user = request.user
         user.delete()
-        return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-    return Response({'error': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return success_response({}, message='User deleted successfully', status=status.HTTP_204_NO_CONTENT)
+    return error_response(message='Method not allowed', status=status.HTTP_405_METHOD_NOT_ALLOWED)
