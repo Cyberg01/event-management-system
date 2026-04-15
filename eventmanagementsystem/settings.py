@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.events',
     'apps.venues',
+    'apps.event_sessions',
 ]
 
 MIDDLEWARE = [
