@@ -4,7 +4,11 @@ from django.core.exceptions import ValidationError
 
 class Sessions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    event = models.ForeignKey('events.Event', on_delete=models.CASCADE, related_name='sessions')
+    event = models.ForeignKey(
+        'events.Event', 
+        on_delete=models.CASCADE, 
+        related_name='sessions'
+    )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     capacity = models.PositiveIntegerField(default=10)
