@@ -31,7 +31,7 @@ def error_response(message="Error", errors=None, status=http_status.HTTP_400_BAD
     {
         "status": false,
         "message": "Error message",
-        "data": {
+        "results": {
             "errors": {...}
         }
     }
@@ -40,7 +40,7 @@ def error_response(message="Error", errors=None, status=http_status.HTTP_400_BAD
         {
             "status": False,
             "message": message,
-            "data": {
+            "results": {
                 "errors": errors
             }
         },
