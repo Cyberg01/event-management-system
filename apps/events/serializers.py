@@ -21,7 +21,6 @@ class EventSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Capacity must be a positive integer.")
         return value
     
-    
     def validate(self, data):
         """
         Validate:
