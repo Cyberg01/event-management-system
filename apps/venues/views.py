@@ -1,19 +1,25 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.generics import ListAPIView
+from apps.venues.filters import VenueFilter
 from .models import Venue
 from .serializers import VenueSerializer
 from apps.common.utils.responses import success_response, error_response
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def listVenues(request):
+class VenueListView(ListAPIView):
     """List all venues"""
-    venues = Venue.objects.all().order_by('name')
-    serializer = VenueSerializer(venues, many=True)
-    return success_response(serializer.data, message="Venues retrieved successfully")
+    queryset = Venue.objects.all().order_by('-created_at')
+    serializer_class = VenueSerializer
+    # permission_classes = [IsAuthenticated]
+    filterset_class = VenueFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['name', 'description', 'city']
+    ordering_fields = ['-created_at']
 
 
 @api_view(['POST'])

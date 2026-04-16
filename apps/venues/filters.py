@@ -11,4 +11,10 @@ class VenueFilter(django_filters.FilterSet):
 
   class Meta:
     model = Venue
-    fields = ('name', 'city', 'state', 'country', 'capacity')
+    fields = {
+      'name': ['iexact', 'icontains'],
+      'city': ['iexact', 'icontains'],
+      'state': ['iexact', 'icontains'],
+      'country': ['iexact', 'icontains'],
+      'capacity': ['gte', 'lte', 'exact'],
+    }
