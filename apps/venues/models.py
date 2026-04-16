@@ -10,6 +10,12 @@ class Venue(models.Model):
     state = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
     capacity = models.IntegerField(null=True, blank=True)
+    venue_image = models.ImageField(
+        upload_to='venues/%Y/%m/%d/', 
+        blank=True, 
+        null=True, 
+        help_text="Optional image for the venue"
+    )
     metadata = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
