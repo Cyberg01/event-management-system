@@ -58,16 +58,6 @@ class Event(models.Model):
         db_table = 'events'
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
-
-    def clean(self):
-        if self.event_start_time < timezone.now():
-            raise ValidationError('Event start time cannot be in the past.')
-        if self.event_end_time <= self.event_start_time:
-            raise ValidationError('Event end time must be after the start time.')
-        if self.registration_start_time < timezone.now():
-            raise ValidationError('Registration start time cannot be in the past.')
-        if self.registration_end_time <= self.registration_start_time:
-            raise ValidationError('Registration end time must be after the registration start time.')
             
     def __str__(self):
         return self.title
