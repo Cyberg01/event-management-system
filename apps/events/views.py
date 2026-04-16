@@ -5,7 +5,7 @@ from .serializers import EventSerializer
 from .models import Event
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
