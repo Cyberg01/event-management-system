@@ -32,7 +32,7 @@ class Event(models.Model):
     capacity = models.PositiveIntegerField(blank=False, null=False)
     current_capacity = models.PositiveBigIntegerField(blank=True)
     event_image = models.ImageField(
-        upload_to='event_images/', 
+        upload_to='events/%Y/%m/%d/', 
         blank=True, 
         null=True, 
         help_text="Optional image for the event"
