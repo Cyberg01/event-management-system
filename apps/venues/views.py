@@ -15,7 +15,7 @@ class VenueListView(ListAPIView):
     """List all venues"""
     queryset = Venue.objects.all().order_by('-created_at')
     serializer_class = VenueSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     filterset_class = VenueFilter
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'description', 'city']
