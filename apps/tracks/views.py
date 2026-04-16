@@ -1,26 +1,27 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter, OrderingFilter
+from apps.tracks.filters import TrackFilter
 from .models import Track
 from .serializers import TrackSerializer
 from apps.common.utils.responses import success_response, error_response
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def listTracks(request):
-    """List all tracks, optionally filtered by event"""
-    event_id = request.query_params.get('event')
-    
-    if event_id:
-        tracks = Track.objects.filter(event__id=event_id).select_related('event')
-    else:
-        tracks = Track.objects.all().select_related('event')
-    
-    tracks = tracks.order_by('event__event_start_time', 'name')
-    serializer = TrackSerializer(tracks, many=True)
-    return success_response(serializer.data, message="Tracks retrieved successfully")
+class ListTracksView(ListAPIView):
+    queryset = Track.objects.all().order_by('-created_at')
+    serializer_class = TrackSerializer
+
+    permission_classes = [IsAuthenticated]
+
+    filterset_class = TrackFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    search_fields = ['name']
+    ordering_fields = ['-created_at']
 
 
 @api_view(['POST'])

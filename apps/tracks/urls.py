@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    listTracks,
+    ListTracksView,
     createTrack,
     showTrackById,
     updateTrack,
@@ -8,7 +8,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path('v1/tracks', listTracks, name='list-tracks'),
+    path('v1/tracks', ListTracksView.as_view(), name='list-tracks'),
     path('v1/tracks/create', createTrack, name='create-track'),
     path('v1/tracks/<uuid:track_id>', showTrackById, name='show-track'),
     path('v1/tracks/<uuid:track_id>/update', updateTrack, name='update-track'),
