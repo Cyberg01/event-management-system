@@ -61,6 +61,12 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        """Add default current_capacity value so it same with capacity when first added"""
+        if not self.pk and self.current_capacity is None:
+            self.current_capacity = self.capacity
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ['-event_start_time']
         db_table = 'events'
