@@ -1,25 +1,27 @@
-from .serializers import SessionsSerializer
 from .models import Sessions
+from .filters import SessionsFilter
+from .serializers import SessionsSerializer
 from django.shortcuts import get_object_or_404
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from apps.common.utils.responses import success_response, error_response
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def listSessions(request):
-    event_id = request.query_params.get('event_id')
-    
-    if event_id:
-        sessions = Sessions.objects.filter(event_id=event_id).select_related('event', 'track')
-    else:
-        sessions = Sessions.objects.all().select_related('event', 'track')
-    
-    sessions = sessions.order_by('start_time')
-    serializer = SessionsSerializer(sessions, many=True)
-    return success_response(serializer.data, message="Sessions retrieved successfully")
+class SessionListView(ListAPIView):
+    queryset = Sessions.objects.all().order_by('-created_at')
+    serializer_class = SessionsSerializer
+
+    permission_classes = [IsAuthenticated]
+
+    filterset_class = SessionsFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    search_fields = ['title', 'description']
+    ordering_fields = ['start_date', 'capacity']
 
 
 @api_view(['POST'])

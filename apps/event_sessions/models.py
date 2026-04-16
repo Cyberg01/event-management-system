@@ -16,6 +16,13 @@ class Sessions(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     speakers = models.JSONField(blank=True, null=True)
+    tracks = models.ForeignKey(
+        'tracks.Track',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='sessions'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
