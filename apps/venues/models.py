@@ -17,6 +17,10 @@ class Venue(models.Model):
     class Meta:
         db_table = 'venues'
         verbose_name = 'Venue'
+        verbose_name_plural = 'Venues'
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'address'], name='unique_venue_name_address')
+        ]
 
     def __str__(self):
         return self.name
