@@ -50,4 +50,17 @@ class EventSerializer(serializers.ModelSerializer):
         if registration_start_time and registration_end_time and registration_end_time <= registration_start_time:
             raise serializers.ValidationError("Registration end time must be after the registration start time.")
         
+        """Check if venue has been booked by other event at the same time"""
+        venue = data.get('venue')
+        if venue and event_start_time and event_end_time:
+            overlapping_events = Event.objects.filter(
+                venue=venue,
+                event_start_time__lt=event_end_time,
+                event_end_time__gt=event_start_time
+            )
+            if self.instance:
+                overlapping_events = overlapping_events.exclude(id=self.instance.id)
+            if overlapping_events.exists():
+                raise serializers.ValidationError("The selected venue is already booked for another event during the specified time.")
+        
         return data
