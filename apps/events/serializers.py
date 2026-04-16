@@ -1,29 +1,54 @@
 from rest_framework import serializers
 from .models import Event
+from django.utils import timezone
+from datetime import timedelta
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
+        read_only_fields = ['id', 'creator', 'created_at', 'updated_at']
     
-    def create(self, validated_data):
-        event = Event.objects.create(**validated_data)
-        return event
-        
-class VenueSerializer(serializers.Serializer):
-    type = serializers.CharField(required=True)
-    name = serializers.CharField(required=True, max_length=255)
-    description = serializers.CharField(required=False)
-    address = serializers.CharField(required=False)
-    city = serializers.CharField(required=False)
-    state = serializers.CharField(required=False)
-    country = serializers.CharField(required=False)
-    link = serializers.URLField(required=False)
-
-    def validate(self, value):
-        venue_type = value.get('type', '').lower()
-
-        if venue_type == 'online':
-            if not value.get('link'):
-                raise serializers.ValidationError("Link is required for online venues.")
+    def validate_title(self, value):
+        """validate that title is at least 3 characters long"""
+        if not value or len(value.strip()) < 3:
+            raise serializers.ValidationError("Title must be at least 3 characters long.")
         return value
+    
+    def validate_capacity(self, value):
+        """validate that capacity is a positive integer"""
+        if value is not None and value < 0:
+            raise serializers.ValidationError("Capacity must be a positive integer.")
+        return value
+    
+    
+    def validate(self, data):
+        """
+        Validate:
+        - Event start/end times must be at least 1 day from now
+        - Registration times must be at least 1 day from now
+        - Event end time > event start time
+        - Registration end time > registration start time
+        """
+
+        event_start_time = data.get('event_start_time')
+        event_end_time = data.get('event_end_time')
+        registration_start_time = data.get('registration_start_time')
+        registration_end_time = data.get('registration_end_time')
+
+        now = timezone.now()
+        min_time = now + timedelta(days=1)
+
+        if event_start_time and event_start_time < min_time:
+            raise serializers.ValidationError("Event start time must be at least 1 day from now.")
+        
+        if registration_start_time and registration_start_time < min_time:
+            raise serializers.ValidationError("Registration start time must be at least 1 day from now.")
+
+        if event_start_time and event_end_time and event_end_time <= event_start_time:
+            raise serializers.ValidationError("Event end time must be after the start time.")
+        
+        if registration_start_time and registration_end_time and registration_end_time <= registration_start_time:
+            raise serializers.ValidationError("Registration end time must be after the registration start time.")
+        
+        return data
