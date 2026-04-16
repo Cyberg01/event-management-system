@@ -19,7 +19,6 @@ def listVenues(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createVenue(request):
-    """Create a new venue (Admin only)"""
     serializer = VenueSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
