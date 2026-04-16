@@ -10,14 +10,14 @@ def success_response(data=None, message="Success", status=http_status.HTTP_200_O
     {
         "status": true,
         "message": "Success message",
-        "data": {...}
+        "results": {...}
     }
     """
     return Response(
         {
             "status": True,
             "message": message,
-            "data": data
+            "results": data
         },
         status=status
     )
