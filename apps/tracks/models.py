@@ -8,6 +8,12 @@ class Track(models.Model):
     description = models.TextField(blank=True, null=True)
     color = models.CharField(max_length=7, blank=True, null=True, help_text="Hex color code, e.g. #FF5733")
     metadata = models.JSONField(blank=True, null=True, help_text="Additional track information")
+    event = models.ForeignKey(
+        'events.Event', on_delete=models.CASCADE, 
+        related_name='tracks', 
+        blank = False, 
+        null = False
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
