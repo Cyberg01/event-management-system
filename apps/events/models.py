@@ -31,6 +31,8 @@ class Event(models.Model):
         choices=EVENT_TYPE,
         default='online'
     )
+    capacity = models.PositiveIntegerField(blank=False, null=False)
+    current_capacity = models.PositiveBigIntegerField(blank=True, null=True)
     event_start_time = models.DateTimeField()
     event_end_time = models.DateTimeField()
     registration_start_time = models.DateTimeField()
