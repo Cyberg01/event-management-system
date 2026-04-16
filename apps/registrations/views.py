@@ -1,3 +1,7 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from apps.registrations.filters import RegistrationsFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.generics import ListAPIView
 from .serializers import RegistrationsSerializer
 from .models import Registrations
 from django.shortcuts import get_object_or_404
@@ -6,20 +10,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from apps.common.utils.responses import success_response, error_response
 
+class RegistraionsListView(ListAPIView):
+    queryset = Registrations.objects.all()
+    serializer_class = RegistrationsSerializer
+    permission_classes = [IsAuthenticated]
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def listRegistrations(request):
-    """List registrations - users see only their own, admins see all"""
-    # Admin can see all, users only see their own
-    if hasattr(request.user, 'role') and request.user.role == 'admin':
-        registrations = Registrations.objects.all()
-    else:
-        registrations = Registrations.objects.filter(attendee=request.user)
-    
-    registrations = registrations.select_related('event', 'session', 'attendee').order_by('-registered_at')
-    serializer = RegistrationsSerializer(registrations, many=True)
-    return success_response(serializer.data, message="Registrations retrieved successfully")
+    filterset_class = RegistrationsFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    search_fields = ['attendee__username', 'event__title', 'session__title', 'status']
+    ordering_fields = ['-created_at']
 
 
 @api_view(['POST'])
