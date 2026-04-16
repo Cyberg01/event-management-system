@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_filters',
 
     # apps
+    'apps.auth',
     'apps.users',
     'apps.events',
     'apps.venues',
