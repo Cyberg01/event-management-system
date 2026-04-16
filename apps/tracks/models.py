@@ -15,8 +15,7 @@ class Track(models.Model):
         db_table = 'tracks'
         verbose_name = 'Track'
         verbose_name_plural = 'Tracks'
-        ordering = ['name']
-        unique_together = ('event', 'name')
+        ordering = ['-created_at']
     
     def __str__(self):
         return f"{self.name}"
