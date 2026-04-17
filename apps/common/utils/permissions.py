@@ -20,16 +20,12 @@ class IsAdminUser(permissions.BasePermission):
         )
 
 
-class IsOwnerOrAdmin(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     """
-    Permission class to check if user is owner or admin.
+    Permission class to check if user isAdmin.
     
     Owner can modify own profile, Admin can modify any profile.
     """
-    
-    def has_permission(self, request, view):
-        """User must be authenticated"""
-        return request.user and request.user.is_authenticated
     
     def has_object_permission(self, request, view, obj):
         """User can access if owner or admin"""
@@ -54,3 +50,17 @@ class IsSuperUser(permissions.BasePermission):
             and request.user.is_authenticated
             and request.user.is_superuser
         )
+    
+class IsEventCreatorOrReadOnly(permissions.BasePermission):
+    """
+    Permission to check if user is the creator of the event.
+    Only event creator can edit or delete the event.
+    """
+    
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any authenticated user
+        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+            return True
+        
+        # Write permissions are only allowed to the creator of the event
+        return obj.creator == request.user
