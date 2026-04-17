@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django_filters',
 
     # apps
-    'apps.auth',
+    'apps.auth.apps.AuthConfig',
     'apps.users',
     'apps.events',
     'apps.venues',
@@ -94,6 +94,14 @@ WSGI_APPLICATION = 'eventmanagementsystem.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'eventmanagementsystem',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'Pass-word123!',
+    #     'HOST': 'localhost',
+    #     'PORT': '5432',
+    # }
     'default': dj_database_url.config(
         conn_max_age=600,
     )
@@ -148,6 +156,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
