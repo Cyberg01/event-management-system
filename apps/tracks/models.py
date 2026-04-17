@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 class Track(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -8,6 +9,13 @@ class Track(models.Model):
     description = models.TextField(blank=True, null=True)
     color = models.CharField(max_length=7, blank=True, null=True, help_text="Hex color code, e.g. #FF5733")
     metadata = models.JSONField(blank=True, null=True, help_text="Additional track information")
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        related_name='tracks', 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+        )
     event = models.ForeignKey(
         'events.Event', on_delete=models.CASCADE, 
         related_name='tracks', 
