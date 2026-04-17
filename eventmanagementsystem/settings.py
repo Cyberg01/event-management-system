@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import dj_database_url
 from datetime import timedelta
 from pathlib import Path
+from apps.config.index import CONFIG
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,12 +25,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c$r(_j&-s)!6f2%p7osd*4l4z9uy_eemtomx+pyxni$rq#eht%'
+SECRET_KEY = CONFIG["app"]["secret_key"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = CONFIG["app"]["debug"]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = CONFIG["app"]["allowed_hosts"]
 
 
 # Application definition
@@ -103,6 +104,7 @@ DATABASES = {
     #     'PORT': '5432',
     # }
     'default': dj_database_url.config(
+        default=CONFIG["app"]["db"],
         conn_max_age=600,
     )
 }
@@ -171,10 +173,10 @@ REST_FRAMEWORK = {
 
 # Simple JWT Configuration
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=CONFIG["jwt"]["access_token_lifetime"]),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=CONFIG["jwt"]["refresh_token_lifetime"]),
+    'ALGORITHM': CONFIG["jwt"]["algorithm"],
+    'SIGNING_KEY': CONFIG["jwt"]["secret_key"],
 }
 
 # CORS Configuration
