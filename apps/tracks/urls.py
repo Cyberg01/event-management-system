@@ -1,16 +1,10 @@
-from django.urls import path
-from .views import (
-    ListTracksView,
-    createTrack,
-    showTrackById,
-    updateTrack,
-    deleteTrack
-)
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import TrackViewSet
+
+router = DefaultRouter()
+router.register(r'v1/tracks', TrackViewSet, basename='track')
 
 urlpatterns = [
-    path('v1/tracks', ListTracksView.as_view(), name='list-tracks'),
-    path('v1/tracks/create', createTrack, name='create-track'),
-    path('v1/tracks/<uuid:track_id>', showTrackById, name='show-track'),
-    path('v1/tracks/<uuid:track_id>/update', updateTrack, name='update-track'),
-    path('v1/tracks/<uuid:track_id>/delete', deleteTrack, name='delete-track'),
+    path('', include(router.urls)),
 ]
