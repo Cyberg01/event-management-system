@@ -12,7 +12,7 @@ class Track(models.Model):
         'events.Event', on_delete=models.CASCADE, 
         related_name='tracks', 
         blank = False, 
-        null = False
+        null = True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
