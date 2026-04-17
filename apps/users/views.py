@@ -1,5 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
+from apps.users.filters import UsersFilter
 from apps.users.models import UserProfile
 from apps.users.serializers import (
     UserDetailSerializer,
@@ -13,6 +16,11 @@ from apps.common.utils.responses import success_response, error_response
 class UserViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all().order_by('-created_at')
     permission_classes = [IsAuthenticated, IsSuperUser]
+
+    filterset_class = UsersFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ['first_name', 'last_name', 'email', 'username']
+    ordering_fields = ['created_at', 'username']
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -37,11 +45,17 @@ class UserViewSet(viewsets.ModelViewSet):
         )
     
     def list(self, request, *args, **kwargs):
+        
         queryset = self.filter_queryset(self.get_queryset())
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
         serializer = self.get_serializer(queryset, many=True)
         return success_response(
             serializer.data,
-            message="Users retrieved successfully"
         )
     
     def retrieve(self, request, *args, **kwargs):
