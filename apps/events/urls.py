@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
+app_name = 'events'
+
+router = DefaultRouter()
+router.register(r'v1/events', views.EventViewSet, basename='event')
+
 urlpatterns = [
-    path('v1/events', views.EventListView.as_view(), name='list-events'),
-    path('v1/events/create', views.createEvent, name='create-event'),
-    path('v1/events/<uuid:event_id>', views.showEventById, name='show-event'),
-    path('v1/events/<uuid:event_id>/update', views.updateEvent, name='update-event'),
-    path('v1/events/<uuid:event_id>/delete', views.deleteEvent, name='delete-event'),
+    path('', include(router.urls)),
 ]
