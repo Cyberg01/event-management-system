@@ -9,7 +9,7 @@ from .models import Event
 from .serializers import EventSerializer
 from .filters import EventFilter
 from apps.common.utils.responses import success_response, error_response
-from apps.common.utils.permissions import IsEventCreatorOrReadOnly
+from apps.common.utils.permissions import IsCreatorOrReadOnly
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -24,7 +24,9 @@ class EventViewSet(viewsets.ModelViewSet):
     - Delete event (DELETE /api/v1/events/{id}/)
     """
     
-    queryset = Event.objects.all().order_by('-created_at')
+    queryset = Event.objects.all().select_related('venue', 'creator')\
+                                .prefetch_related('tracks', 'tracks__sessions')\
+                                .order_by('-created_at')
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
     
@@ -40,12 +42,12 @@ class EventViewSet(viewsets.ModelViewSet):
         Set permission based on action.
         - list, retrieve: IsAuthenticated
         - create: IsAuthenticated
-        - update, partial_update, destroy: IsEventCreatorOrReadOnly
+        - update, partial_update, destroy: IsCreatorOrReadOnly
         """
         if self.action in ['list', 'retrieve', 'create']:
             permission_classes = [IsAuthenticated]
         else:
-            permission_classes = [IsAuthenticated, IsEventCreatorOrReadOnly]
+            permission_classes = [IsAuthenticated, IsCreatorOrReadOnly]
         
         return [permission() for permission in permission_classes]
 
