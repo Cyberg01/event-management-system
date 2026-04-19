@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
+app_name = 'sessions'
+
+router = DefaultRouter()
+router.register(r'v1/sessions', views.SessionViewSet, basename='session')
+
 urlpatterns = [
-    path('v1/sessions', views.SessionListView.as_view(), name='list-sessions'),
-    path('v1/sessions/create', views.createSession, name='create-session'),
-    path('v1/sessions/<uuid:session_id>', views.showSessionById, name='show-session'),
-    path('v1/sessions/<uuid:session_id>/update', views.updateSession, name='update-session'),
-    path('v1/sessions/<uuid:session_id>/delete', views.deleteSession, name='delete-session'),
+    path('', include(router.urls)),
 ]
