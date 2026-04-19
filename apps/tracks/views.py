@@ -1,10 +1,10 @@
 # views.py
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
+from rest_framework import request, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
 from apps.common.utils.permissions import IsAdminUser, IsEventCreatorOrReadOnly
-from apps.common.utils.responses import error_response
+from apps.common.utils.responses import success_response, error_response
 from apps.tracks.filters import TrackFilter
 from apps.tracks.models import Track
 from apps.tracks.serializers import TrackSerializer
@@ -20,7 +20,7 @@ class TrackViewSet(viewsets.ModelViewSet):
     """
     queryset = Track.objects.all().order_by('-created_at')
     serializer_class = TrackSerializer
-    permission_classes = [IsAuthenticated, IsEventCreatorOrReadOnly, IsAdminUser]
+    permission_classes = [IsAuthenticated]
     
     filterset_class = TrackFilter
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -37,7 +37,7 @@ class TrackViewSet(viewsets.ModelViewSet):
         
         if serializer.is_valid():
             # Set the creator to the authenticated user
-            serializer.save(creator=request.user)
+            serializer.save(creator=str(request.user.id))
             return success_response(
                 serializer.data,
                 message="Track created successfully",
@@ -79,21 +79,23 @@ class TrackViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
 
-            is_admin = request.user.roles.lower() == 'admin' or request.user.is_superuser
+            print("Logger", {request})
+
+            is_admin = request.user.role.lower() == 'admin' or request.user.is_superuser
             
             # Check if user is the creator or admin
-            if instance.creator != request.user and not is_admin:
+            if instance.creator != str(request.user.id) and not is_admin:
                 return error_response(
                     "You don't have permission to delete this track",
                     status=status.HTTP_403_FORBIDDEN
                 )
             
             # Check if track has registrations
-            if instance.registrations.exists():
-                return error_response(
-                    "Cannot delete track with existing registrations",
-                    status=status.HTTP_409_CONFLICT
-                )
+            # if instance.registrations.exists():
+            #     return error_response(
+            #         "Cannot delete track with existing registrations",
+            #         status=status.HTTP_409_CONFLICT
+            #     )
             
             instance.delete()
             return success_response(
