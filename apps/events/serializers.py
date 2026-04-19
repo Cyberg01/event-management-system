@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from apps.event_sessions.serializers import SessionsSerializer
+from apps.tracks.serializers import TrackSerializer
 from apps.venues.serializers import VenueSerializer
 from .models import Event
 from apps.venues.models import Venue
@@ -13,6 +15,8 @@ class EventSerializer(serializers.ModelSerializer):
     )
 
     venue = VenueSerializer(read_only=True)
+    tracks = TrackSerializer(many=True, read_only=True)
+    sessions = SessionsSerializer(many=True, read_only=True)
     
     class Meta:
         model = Event
@@ -93,7 +97,6 @@ class EventSerializer(serializers.ModelSerializer):
         return event
     
     def update(self, instance, validated_data):
-        # Update semua field termasuk venue (langsung, bukan .set())
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
