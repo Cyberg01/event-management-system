@@ -51,10 +51,10 @@ class IsSuperUser(permissions.BasePermission):
             and request.user.is_superuser
         )
     
-class IsEventCreatorOrReadOnly(permissions.BasePermission):
+class IsCreatorOrReadOnly(permissions.BasePermission):
     """
-    Permission to check if user is the creator of the event.
-    Only event creator can edit or delete the event.
+    Permission to check if user is the creator of.
+    Only creator can edit or delete.
     """
     
     def has_object_permission(self, request, view, obj):
@@ -62,5 +62,5 @@ class IsEventCreatorOrReadOnly(permissions.BasePermission):
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             return True
         
-        # Write permissions are only allowed to the creator of the event
+        # Write permissions are only allowed to the creator
         return obj.creator == request.user
