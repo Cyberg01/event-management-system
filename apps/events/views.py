@@ -86,43 +86,43 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-    def update(self, request, *args, **kwargs):
-        """
-        Update an existing event (full update).
-        - User must be the event creator
-        - All required fields must be provided
-        """
-        try:
-            instance = self.get_object()
+    # def update(self, request, *args, **kwargs):
+    #     """
+    #     Update an existing event (full update).
+    #     - User must be the event creator
+    #     - All required fields must be provided
+    #     """
+    #     try:
+    #         instance = self.get_object()
             
-            # Check if user is the creator
-            if instance.creator != request.user:
-                return error_response(
-                    "You don't have permission to update this event",
-                    status=status.HTTP_403_FORBIDDEN
-                )
+    #         # Check if user is the creator
+    #         if instance.creator != request.user:
+    #             return error_response(
+    #                 "You don't have permission to update this event",
+    #                 status=status.HTTP_403_FORBIDDEN
+    #             )
             
-            serializer = self.get_serializer(instance, data=request.data, partial=False)
+    #         serializer = self.get_serializer(instance, data=request.data, partial=False)
             
-            if serializer.is_valid():
-                serializer.save()
-                return success_response(
-                    serializer.data,
-                    message="Event updated successfully"
-                )
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return success_response(
+    #                 serializer.data,
+    #                 message="Event updated successfully"
+    #             )
             
-            return error_response(
-                "Validation error occurred",
-                errors=serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except Event.DoesNotExist:
-            return error_response(
-                "Event not found",
-                status=status.HTTP_404_NOT_FOUND
-            )
+    #         return error_response(
+    #             "Validation error occurred",
+    #             errors=serializer.errors,
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+    #     except Event.DoesNotExist:
+    #         return error_response(
+    #             "Event not found",
+    #             status=status.HTTP_404_NOT_FOUND
+    #         )
 
-    def partial_update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         """
         Partial update of an event.
         - User must be the event creator

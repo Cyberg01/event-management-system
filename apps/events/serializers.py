@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.venues.serializers import VenueSerializer
 from .models import Event
 from apps.venues.models import Venue
 from django.utils import timezone
@@ -7,9 +8,11 @@ from datetime import timedelta
 class EventSerializer(serializers.ModelSerializer):
     venue = serializers.PrimaryKeyRelatedField(
         queryset=Venue.objects.all(),
-        many=False,  # ← ubah ke False (ForeignKey, bukan M2M)
+        many=False,
         required=False
     )
+
+    venue = VenueSerializer(read_only=True)
     
     class Meta:
         model = Event
@@ -57,10 +60,10 @@ class EventSerializer(serializers.ModelSerializer):
         if registration_start_time and registration_end_time and registration_end_time <= registration_start_time:
             raise serializers.ValidationError({"registration_end_time": "Registration end time must be after the registration start time."})
         
-        if registration_start_time > event_start_time:
+        if registration_start_time and event_start_time and registration_start_time > event_start_time:
             raise serializers.ValidationError({"registration_start_time": "Registration start time must be before the event start time."})
         
-        if registration_end_time > event_start_time:
+        if registration_end_time and event_start_time and registration_end_time > event_start_time:
             raise serializers.ValidationError({"registration_end_time": "Registration end time must be before the event start time."})
         
         # Check if venue is booked by other events at the same time
