@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import request, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
-from apps.common.utils.permissions import IsAdminUser, IsEventCreatorOrReadOnly
+from apps.common.utils.permissions import IsAdminUser, IsCreatorOrReadOnly
 from apps.common.utils.responses import success_response, error_response
 from apps.tracks.filters import TrackFilter
 from apps.tracks.models import Track
