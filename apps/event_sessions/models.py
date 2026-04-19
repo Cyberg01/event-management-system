@@ -22,6 +22,12 @@ class Sessions(models.Model):
         blank=True,
         related_name='sessions'
     )
+    speakers = models.ManyToManyField(
+        'speakers.Speaker',
+        related_name='sessions',
+        blank=True,
+        help_text="Speakers assigned to this session"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
