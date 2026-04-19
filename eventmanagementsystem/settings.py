@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'apps.event_sessions',
     'apps.registrations',
     'apps.tracks',
+    'apps.speakers',
 ]
 
 MIDDLEWARE = [
