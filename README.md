@@ -85,36 +85,6 @@ The following diagram and table list describe the main entities (tables) in the 
 - FK = Foreign Key
 - M2M = Many-to-Many
 
-These tables are related as shown in the ERD below.
-
-Below is the main entity-relationship diagram (ERD) for the Event Management System database schema:
-
-```mermaid
-erDiagram
-	USER ||--o{ USER_PROFILE : has
-	USER_PROFILE ||--o{ EVENT : creates
-	USER_PROFILE ||--o{ REGISTRATION : registers
-	USER_PROFILE ||--o{ SESSION : speaks_at
-	EVENT ||--o{ TRACK : has
-	EVENT ||--o{ SESSION : has
-	EVENT ||--o{ REGISTRATION : has
-	EVENT }o--|| VENUE : held_at
-	TRACK ||--o{ SESSION : has
-	SESSION ||--o{ USER_PROFILE : speakers
-	SESSION }o--|| TRACK : belongs_to
-	SESSION }o--|| EVENT : belongs_to
-	SESSION }o--|| VENUE : room
-	REGISTRATION }o--|| USER_PROFILE : for_user
-	REGISTRATION }o--|| EVENT : for_event
-	VENUE ||--o{ EVENT : hosts
-```
-
-This diagram visualizes the main tables and their relationships, including users, profiles, events, sessions, tracks, venues, and registrations.
-
-- USER : Data table for client data
-- Event : Data 
-
----
 
 ## Setup Instructions
 
