@@ -13,7 +13,7 @@ CONFIG = {
     "jwt": {
         "secret_key": os.getenv("JWT_SECRET_KEY", None),
         "algorithm": "HS256",
-        "access_token_lifetime": 60,  # minutes
+        "access_token_lifetime": 60 * 24 * 7,  # minutes
         "refresh_token_lifetime": 1,  # days
     }
 }
