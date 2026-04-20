@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.core.exceptions import ValidationError
-
+from django.conf import settings
 
 class Sessions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
@@ -9,7 +9,15 @@ class Sessions(models.Model):
     description = models.TextField(blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    creator = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='sessions',
+        help_text="User who created this session",
+        db_index=True
+    )
     event = models.ForeignKey(
         'events.Event', 
         on_delete=models.CASCADE, 

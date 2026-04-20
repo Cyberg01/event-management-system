@@ -1,7 +1,17 @@
 from rest_framework import serializers
+from apps.speakers.models import Speaker
 from apps.tracks.models import Track
 from .models import Sessions
 from apps.events.models import Event
+
+
+class SpeakerListSerializer(serializers.ModelSerializer):
+    """Nested serializer for displaying speaker details in session response"""
+    class Meta:
+        model = Speaker
+        fields = ['id', 'full_name', 'email', 'title', 'company', 'bio', 'expertise']
+        read_only_fields = fields
+
 
 class SessionsSerializer(serializers.ModelSerializer):
     event = serializers.PrimaryKeyRelatedField(
@@ -23,7 +33,16 @@ class SessionsSerializer(serializers.ModelSerializer):
             'invalid': 'Invalid track ID format.'
         }
     )
-    
+
+    speakers = serializers.PrimaryKeyRelatedField(
+        queryset=Speaker.objects.all(),
+        many=True,
+        required=False,
+        error_messages={
+            'does_not_exist': 'Speaker with id {pk_value} does not exist.',
+            'invalid': 'Invalid speaker ID format.'
+        }
+    )
 
     event_title = serializers.CharField(source='event.title', read_only=True)
     event_start = serializers.DateTimeField(source='event.event_start_time', read_only=True)
@@ -36,11 +55,49 @@ class SessionsSerializer(serializers.ModelSerializer):
             'id', 'title', 'description',
             'start_time', 'end_time', 'creator', 'event', 'tracks',
             'created_at', 'updated_at',
-            'event_title', 'event_start', 'event_end', 'track_name'
+            'event_title', 'event_start', 'event_end', 'track_name',
+            'speakers'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'creator']\
+        read_only_fields = ['id', 'created_at', 'updated_at', 'creator']
 
-    
+    def to_internal_value(self, data):
+        """
+        Validate that no unknown fields are provided in request.
+        Raises ValidationError if typo or unexpected fields are sent.
+        """
+        # Get all allowed field names (writable fields)
+        allowed_fields = set(self.fields.keys())
+        provided_fields = set(data.keys())
+        
+        # Find unknown fields
+        unknown_fields = provided_fields - allowed_fields
+        
+        if unknown_fields:
+            errors = {}
+            valid_fields_list = ', '.join(sorted(allowed_fields))
+            for field in unknown_fields:
+                errors[field] = f"Unknown field. Valid fields are: {valid_fields_list}"
+            raise serializers.ValidationError(errors)
+        
+        # Proceed with normal validation
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        """
+        Override output representation to show full speaker details instead of just IDs.
+        This is used for GET requests to display detailed speaker information.
+        """
+        data = super().to_representation(instance)
+        
+        # Replace speaker IDs with full speaker objects
+        if instance.speakers.exists():
+            speakers = instance.speakers.all()
+            data['speakers'] = SpeakerListSerializer(speakers, many=True).data
+        else:
+            data['speakers'] = []
+        
+        return data
+
     def validate(self, data):
         """Validate session data including time conflicts and boundaries"""
         start_time = data.get('start_time', self.instance.start_time if self.instance else None)
