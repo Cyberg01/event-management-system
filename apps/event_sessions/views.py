@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import request, viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -24,11 +24,11 @@ class SessionViewSet(viewsets.ModelViewSet):
     Note: PUT is disabled, only PATCH is allowed for updates
     """
     
-    queryset = Sessions.objects.all().select_related('event', 'tracks').order_by('-created_at')
+    queryset = Sessions.objects.all().select_related('event', 'tracks', 'creator').prefetch_related('speakers').order_by('-created_at')
     serializer_class = SessionsSerializer
     permission_classes = [IsAuthenticated]
     
-    # Filtering and searching configuration
+    # Filtering and search configuration
     filterset_class = SessionsFilter
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['title', 'description']
@@ -50,15 +50,24 @@ class SessionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Create a new session.
+        Create a new session with speakers.
         """
         serializer = self.get_serializer(data=request.data)
-        
+    
         if serializer.is_valid():
-            # Set creator to authenticated user's id
-            serializer.save(creator=request.user.id)
+            # Save instance with creator
+            instance = serializer.save(creator=request.user)
+            
+            # Manually assign speakers if provided
+            if 'speakers' in request.data:
+                speakers_data = request.data.get('speakers', [])
+                instance.speakers.set(speakers_data)
+            
+            # Fetch fresh instance with all relations and return updated data
+            instance = Sessions.objects.prefetch_related('speakers').get(pk=instance.pk)
+            updated_serializer = self.get_serializer(instance)
             return success_response(
-                serializer.data,
+                updated_serializer.data,
                 message="Session created successfully",
                 status=status.HTTP_201_CREATED
             )
@@ -73,7 +82,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         """List all sessions with filtering and pagination"""
         queryset = self.filter_queryset(self.get_queryset())
         
-        # Pagination
+        # Apply pagination to queryset
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -102,8 +111,8 @@ class SessionViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """
-        Only provided fields will be updated.
-        Only creator can update their own sessions.
+        Partially update a session. Only provided fields will be updated.
+        Only the creator can update their own sessions.
         """
         try:
             instance = self.get_object()
@@ -111,9 +120,19 @@ class SessionViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(instance, data=request.data, partial=True)
             
             if serializer.is_valid():
+                # Save all fields except speakers (ManyToMany)
                 serializer.save()
+                
+                # Update speakers relationship if provided
+                if 'speakers' in request.data:
+                    speakers_data = request.data.get('speakers', [])
+                    instance.speakers.set(speakers_data)
+                
+                # Fetch fresh instance with speakers and return updated data
+                instance = Sessions.objects.prefetch_related('speakers').get(pk=instance.pk)
+                updated_serializer = self.get_serializer(instance)
                 return success_response(
-                    serializer.data,
+                    updated_serializer.data,
                     message="Session updated successfully"
                 )
             
@@ -127,11 +146,11 @@ class SessionViewSet(viewsets.ModelViewSet):
                 "Session not found",
                 status=status.HTTP_404_NOT_FOUND
             )
-
+    
     def destroy(self, request, *args, **kwargs):
         """
         Delete a session.
-        Only creator can delete their own sessions.
+        Only the creator can delete their own sessions.
         """
         try:
             instance = self.get_object()
