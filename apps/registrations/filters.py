@@ -1,14 +1,29 @@
 import django_filters
-from .models import Registrations
+from apps.registrations.models import Registrations
 
 
-class RegistrationsFilter(django_filters.FilterSet):
-  name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
-  attendee = django_filters.CharFilter(field_name='attendee__username', lookup_expr='icontains')
-  event = django_filters.CharFilter(field_name='event__title', lookup_expr='icontains')
-  session = django_filters.CharFilter(field_name='session__title', lookup_expr='icontains')
-  status = django_filters.CharFilter(field_name='status', lookup_expr='iexact')
+class RegistrationFilter(django_filters.FilterSet):
+    event       = django_filters.UUIDFilter(field_name='event__id')
+    event_title = django_filters.CharFilter(
+        field_name='event__title',
+        lookup_expr='icontains'
+    )
+    status    = django_filters.ChoiceFilter(choices=Registrations.STATUS_CHOICES)
+    email     = django_filters.CharFilter(lookup_expr='icontains')
+    full_name = django_filters.CharFilter(lookup_expr='icontains')
+    organization = django_filters.CharFilter(lookup_expr='icontains')
 
-  class Meta:
-    model = Registrations
-    fields = ['name', 'attendee', 'event', 'session', 'status']
+    registered_after  = django_filters.DateTimeFilter(
+        field_name='created_at', lookup_expr='gte'
+    )
+    registered_before = django_filters.DateTimeFilter(
+        field_name='created_at', lookup_expr='lte'
+    )
+
+    class Meta:
+        model  = Registrations
+        fields = [
+            'event', 'event_title', 'status',
+            'email', 'full_name', 'organization',
+            'registered_after', 'registered_before',
+        ]
