@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.conf import settings
 
 
 class Speaker(models.Model):
@@ -27,11 +28,13 @@ class Speaker(models.Model):
         default=dict,
         help_text="Additional speaker information"
     )
-    creator = models.CharField(
-        max_length=255, 
-        blank=True, null=True, 
-        help_text="User who created this speaker profile", 
-        db_index=True
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='speakers',
+        help_text="User who created this speaker"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -17,7 +17,7 @@ class SpeakerViewSet(viewsets.ModelViewSet):
     - GET    /api/v1/speakers/          - List all speakers
     - POST   /api/v1/speakers/          - Create new speaker
     - GET    /api/v1/speakers/{id}/     - Retrieve speaker detail
-    - PATCH  /api/v1/speakers/{id}/     - Partial update speaker
+    - PUT    /api/v1/speakers/{id}/     - Update speaker
     - DELETE /api/v1/speakers/{id}/     - Delete speaker
     """
     
@@ -25,7 +25,7 @@ class SpeakerViewSet(viewsets.ModelViewSet):
     serializer_class = SpeakerSerializer
     permission_classes = [IsAuthenticated]
     
-    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'put', 'delete', 'head', 'options']
     
     # Filtering and searching configuration
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -51,7 +51,7 @@ class SpeakerViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save(creator=request.user.username)
+            serializer.save(creator=request.user.id)
             return success_response(
                 serializer.data,
                 message="Speaker created successfully",
@@ -95,7 +95,7 @@ class SpeakerViewSet(viewsets.ModelViewSet):
             )
 
     def update(self, request, *args, **kwargs):
-        """Partial update speaker (PATCH only)"""
+        """Update speaker (PUT only)"""
         try:
             instance = self.get_object()
             serializer = self.get_serializer(instance, data=request.data, partial=True)
