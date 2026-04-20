@@ -127,9 +127,10 @@ To create a superuser inside the running container:
 docker-compose exec web python manage.py createsuperuser
 ```
 
-notes : 
+*Notes : *
 
-In this project there is already a default user that was made during first build. (look at : )
+In this project there is already a default superuser that was made during first build. 
+(look at: [0002_auto_20260420_2007.py](apps/users/migrations/0002_auto_20260420_2007.py))
 
 username : admin
 email : admin@admin.com
