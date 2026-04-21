@@ -77,7 +77,7 @@ The following diagram and table list describe the main entities (tables) in the 
 | UserProfile   | Extended user info and role management                                 | user (FK), bio, role (admin/organizer/attendee/speaker), profile_picture, created_at     |
 | Event         | Represents an event or conference                                      | title, description, start_date, end_date, capacity, venue (FK), creator (FK), status     |
 | Track         | Logical grouping of sessions within an event                           | name, description, event (FK), created_at                                                |
-| Session       | Individual sessions/talks within an event                              | title, description, start_time, end_time, speakers (M2M), track (FK), event (FK), room   |
+| Session       | Individual sessions/talks within an event                              | title, description, start_time, end_time, speakers (M2M), track (FK), event (FK)   |
 | Venue         | Physical location for events/sessions                                  | name, address, city, capacity, amenities, venue_image, created_at                        |
 | Registration  | User registration for an event                                         | user (FK), event (FK), registered_at, status, check_in_at                                |
 
